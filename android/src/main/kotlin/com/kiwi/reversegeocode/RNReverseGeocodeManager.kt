@@ -21,48 +21,48 @@ import java.util.Locale
 import kotlin.collections.List
 
 
-class RNReverseGeocodeManager (reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
+class RNReverseGeocodeManager(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 
   companion object {
-      const val MAX_RESULTS = 10
+    const val MAX_RESULTS = 10
+
+    fun getLocationFromAddress(address: Address): WritableMap {
+      val location = WritableNativeMap()
+      location.putDouble("latitude", address.getLatitude())
+      location.putDouble("longitude", address.getLongitude())
+      return location
+    }
+
+    fun getFirstLineOfAddress(address: Address): String {
+      if (address.getMaxAddressLineIndex() > -1) {
+        return address.getAddressLine(0)
+      }
+      return ""
+    }
+
+    fun formatAddress(address: Address): WritableMap {
+      val addressObject = WritableNativeMap()
+
+      addressObject.putString("name", address.getFeatureName())
+      addressObject.putMap("location", getLocationFromAddress(address))
+      addressObject.putString("address", getFirstLineOfAddress(address))
+
+      return addressObject
+    }
+
+    fun formatAddresses(addresses: List<Address>): WritableArray {
+      val formattedAddresses = WritableNativeArray()
+
+      for (address in addresses) {
+        formattedAddresses.pushMap(formatAddress(address))
+      }
+
+      return formattedAddresses
+    }
   }
 
   override fun getName(): String {
     return "RNReverseGeocode"
-  }
-
-  private fun getLocationFromAddress(address: Address): WritableMap {
-    val location = WritableNativeMap()
-    location.putDouble("latitude", address.getLatitude())
-    location.putDouble("longitude", address.getLongitude())
-    return location
-  }
-
-  private fun getFirstLineOfAddress(address: Address): String {
-    if (address.getMaxAddressLineIndex() > -1) {
-      return address.getAddressLine(0)
-    }
-    return ""
-  }
-
-  private fun formatAddress(address: Address): WritableMap {
-    val addressObject = WritableNativeMap()
-    
-    addressObject.putString("name", address.getFeatureName())
-    addressObject.putMap("location", getLocationFromAddress(address))
-    addressObject.putString("address", getFirstLineOfAddress(address))
-    
-    return addressObject
-  }
-
-  private fun formatAddresses(addresses: List<Address> ): WritableArray {
-    val formattedAddresses = WritableNativeArray()
-    
-    for(address in addresses) {
-      formattedAddresses.pushMap(formatAddress(address))
-    }
-    
-    return formattedAddresses
   }
 
   @ReactMethod
