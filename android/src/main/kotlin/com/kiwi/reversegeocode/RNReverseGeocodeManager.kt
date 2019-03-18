@@ -80,6 +80,7 @@ class RNReverseGeocodeManager (reactContext: ReactApplicationContext) : ReactCon
 
     if (!Geocoder.isPresent()) {
       callback.invoke("Geocoder is not present", null)
+      return
     }
 
     val latitude = region.getDouble("latitude")
